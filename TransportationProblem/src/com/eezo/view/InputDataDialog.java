@@ -1,4 +1,7 @@
-package com.eezo;
+package com.eezo.view;
+
+import com.eezo.FuzzyMatrix;
+import com.eezo.TransData;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -10,6 +13,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * GUI that allows to input data via form manually.
+ */
 public class InputDataDialog extends JDialog {
     private JPanel contentPane;
     private JButton buttonOK;
@@ -26,33 +32,41 @@ public class InputDataDialog extends JDialog {
     private JTextField tfFileName;
     private JTable tableTMatrix;
     private JButton buttonTMatrix;
+    /**
+     * List of customers and their offers
+     */
     private List<String> customers;
+    /**
+     * List of providers and their demands
+     */
     private List<String> providers;
+    /**
+     * Costs per unit of production matrix
+     */
     private int[][] matrix;
-    private TransData.TriangularNumber[][] tmatrix;
+    /**
+     * Fuzzy costs per unit of production matrix
+     */
+    private FuzzyMatrix.TriangularNumber[][] tmatrix;
 
-    private TransData transData;
 
-    public InputDataDialog(TransData transData) {
+    public InputDataDialog() {
         setModal(true);
         setContentPane(contentPane);
         setBounds(500, 310, 560, 340);
         getRootPane().setDefaultButton(buttonOK);
 
-        this.transData = transData;
-        if (transData != null){
-            customers = transData.getCustomers();
-            providers = transData.getProviders();
-            matrix = transData.getMatrix();
-            tmatrix = transData.getTmatrix();
+            customers = TransData.staticObject.getCustomers();
+            providers = TransData.staticObject.getProviders();
+            matrix = TransData.staticObject.getMatrix();
+            tmatrix = TransData.staticObject.getTmatrix();
 
             for (int i = 0; i < customers.size(); i++) {
-                customers.set(i, customers.get(i)+"-"+transData.getProvidersValues()[i]);
+                customers.set(i, customers.get(i)+"-"+TransData.staticObject.getProvidersValues()[i]);
             }
             for (int i = 0; i < providers.size(); i++) {
-                providers.set(i, providers.get(i)+"-"+transData.getCustomersValues()[i]);
+                providers.set(i, providers.get(i)+"-"+TransData.staticObject.getCustomersValues()[i]);
             }
-        }
         if (customers == null){
             customers = new ArrayList<>();
         }
@@ -63,7 +77,7 @@ public class InputDataDialog extends JDialog {
             matrix = new int[customers.size()][providers.size()];
         }
         if (tmatrix == null){
-            tmatrix = new TransData.TriangularNumber[customers.size()][providers.size()];
+            tmatrix = new FuzzyMatrix.TriangularNumber[customers.size()][providers.size()];
         }
         loadLists();
         loadMatrix();
@@ -149,7 +163,7 @@ public class InputDataDialog extends JDialog {
         buttonTMatrix.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                tmatrix = new TransData.TriangularNumber[providers.size()][customers.size()];
+                tmatrix = new FuzzyMatrix.TriangularNumber[providers.size()][customers.size()];
                 loadTMatrix();
             }
         });
@@ -191,14 +205,17 @@ public class InputDataDialog extends JDialog {
     }
 
     private void onOK() {
-        if (transData == null){
-            transData = new TransData();
+        try {
+            new TransData.Builder(customers, providers, matrix).build();
+        } catch (Exception e){
+            JOptionPane.showMessageDialog(null, e.getMessage());
+            return;
         }
-        String message = TransData.getInputErrorMessage(transData.inputAllData(customers, providers, matrix, tmatrix));
+        /*String message = TransData.getInputErrorMessage(transData.inputAllData(customers, providers, matrix, tmatrix));
         if (message != null){
             JOptionPane.showMessageDialog(null,message);
             return;
-        }
+        }*/
         if (checkboxWriteData.isSelected()){
             writeFile();
         }
@@ -221,32 +238,32 @@ public class InputDataDialog extends JDialog {
         try {
             BufferedWriter bw = new BufferedWriter(new FileWriter(new File(fileName)));
             bw.write(":cust\n");
-            for (int i = 0; i < transData.getCustomers().size(); i++) {
-                bw.write(transData.getCustomers().get(i)+"\n");
+            for (int i = 0; i < TransData.staticObject.getCustomers().size(); i++) {
+                bw.write(TransData.staticObject.getCustomers().get(i)+"\n");
             }
             bw.write(":prov\n");
-            for (int i = 0; i < transData.getProviders().size(); i++) {
-                bw.write(transData.getProviders().get(i)+"\n");
+            for (int i = 0; i < TransData.staticObject.getProviders().size(); i++) {
+                bw.write(TransData.staticObject.getProviders().get(i)+"\n");
             }
             bw.write(":custval\n");
-            for (int i = 0; i < transData.getProvidersValues().length; i++) {
-                bw.write(transData.getProvidersValues()[i]+"\n");
+            for (int i = 0; i < TransData.staticObject.getProvidersValues().length; i++) {
+                bw.write(TransData.staticObject.getProvidersValues()[i]+"\n");
             }
             bw.write(":provval\n");
-            for (int i = 0; i < transData.getCustomersValues().length; i++) {
-                bw.write(transData.getCustomersValues()[i]+"\n");
+            for (int i = 0; i < TransData.staticObject.getCustomersValues().length; i++) {
+                bw.write(TransData.staticObject.getCustomersValues()[i]+"\n");
             }
             bw.write(":mtrx\n");
-            for (int i = 0; i < transData.getMatrix().length; i++) {
-                for (int j = 0; j < transData.getMatrix()[i].length; j++) {
-                    bw.write(transData.getMatrix()[i][j]+" ");
+            for (int i = 0; i < TransData.staticObject.getMatrix().length; i++) {
+                for (int j = 0; j < TransData.staticObject.getMatrix()[i].length; j++) {
+                    bw.write(TransData.staticObject.getMatrix()[i][j]+" ");
                 }
                 bw.write("\n");
             }
             bw.write(":tmtrx\n");
-            for (int i = 0; i < transData.getTmatrix().length; i++) {
-                for (int j = 0; j < transData.getTmatrix()[i].length; j++) {
-                    bw.write(transData.getTmatrix()[i][j]+" ");
+            for (int i = 0; i < TransData.staticObject.getTmatrix().length; i++) {
+                for (int j = 0; j < TransData.staticObject.getTmatrix()[i].length; j++) {
+                    bw.write(TransData.staticObject.getTmatrix()[i][j]+" ");
                 }
                 bw.write("\n");
             }
@@ -260,8 +277,8 @@ public class InputDataDialog extends JDialog {
         return !(record == null || record.isEmpty()) && record.matches("^[\"#'№!-&*а-яА-ЯёЁa-zA-Z0-9\\s]+[-]\\s*[\\d]+$");
     }
 
-    public static void main(TransData transData) {
-        InputDataDialog dialog = new InputDataDialog(transData);
+    public static void main(String[] args) {
+        InputDataDialog dialog = new InputDataDialog();
         dialog.pack();
         dialog.setVisible(true);
     }

@@ -4,10 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * A class that represents a matrix of costs
  * Created by Eezo on 03.03.2016.
  */
-
 class Matrix {
     private Cell[] matrix;
     private int rowsNumber;

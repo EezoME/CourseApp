@@ -1,4 +1,4 @@
-package com.eezo;
+package com.eezo.view;
 
 import javax.swing.*;
 import java.awt.event.*;

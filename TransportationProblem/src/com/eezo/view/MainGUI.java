@@ -1,4 +1,8 @@
-package com.eezo;
+package com.eezo.view;
+
+import com.eezo.AlternativeSolution;
+import com.eezo.FuzzyMatrix;
+import com.eezo.TransData;
 
 import javax.swing.*;
 import java.awt.*;
@@ -16,8 +20,6 @@ public class MainGUI extends JFrame {
     private JButton buttonLoadDataFromFile;
     private JButton buttonDoCalculations;
     private JPanel panel1;
-
-    private TransData transData;
 
     public MainGUI() {
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
@@ -50,8 +52,8 @@ public class MainGUI extends JFrame {
 
     public void firstStage(){
         java.util.List<AlternativeSolution> asList = new ArrayList<>();
-        asList.add(AlternativeSolution.northWestCorner(transData.getProvidersValues(), transData.getCustomersValues()));
-        asList.get(0).calculateZ(transData.getMatrix());
+        asList.add(AlternativeSolution.northWestCorner(TransData.staticObject.getProvidersValues(), TransData.staticObject.getCustomersValues()));
+        asList.get(0).calculateZ(TransData.staticObject.getMatrix());
         for (int i = 0; i < asList.get(0).getASCount(); i++) {
             //TODO find an alternative solution
         }
@@ -60,15 +62,12 @@ public class MainGUI extends JFrame {
     /** CUSTOM **/
 
     private void launchDialog() {
-        InputDataDialog.main(transData);
+        InputDataDialog.main(null);
     }
 
     private void readFile(File file) {
         if (file == null) {
             return;
-        }
-        if (transData == null) {
-            transData = new TransData();
         }
         try {
             BufferedReader br = new BufferedReader(new FileReader(file));
@@ -88,30 +87,30 @@ public class MainGUI extends JFrame {
                 if (line.startsWith(":")) {
                     switch (line) {
                         case ":cust":
-                            transData.setCustomers(new ArrayList<String>());
+                            TransData.staticObject.setCustomers(new ArrayList<String>());
                             state = 1;
                             break;
                         case ":prov":
-                            transData.setProviders(new ArrayList<String>());
+                            TransData.staticObject.setProviders(new ArrayList<String>());
                             state = 2;
                             break;
                         case ":custval":
-                            transData.setProvidersValues(new int[transData.getCustomers().size()]);
+                            TransData.staticObject.setProvidersValues(new int[TransData.staticObject.getCustomers().size()]);
                             state = 3;
                             counter = 0;
                             break;
                         case ":provval":
-                            transData.setCustomersValues(new int[transData.getProviders().size()]);
+                            TransData.staticObject.setCustomersValues(new int[TransData.staticObject.getProviders().size()]);
                             state = 4;
                             counter = 0;
                             break;
                         case ":mtrx":
-                            transData.setMatrix(new int[transData.getProviders().size()][transData.getCustomers().size()]);
+                            TransData.staticObject.setMatrix(new int[TransData.staticObject.getProviders().size()][TransData.staticObject.getCustomers().size()]);
                             state = 5;
                             counter = 0;
                             break;
                         case ":tmtrx":
-                            transData.setTmatrix(new TransData.TriangularNumber[transData.getProviders().size()][transData.getCustomers().size()]);
+                            TransData.staticObject.setTmatrix(new FuzzyMatrix.TriangularNumber[TransData.staticObject.getProviders().size()][TransData.staticObject.getCustomers().size()]);
                             state = 6;
                             counter = 0;
                             break;
@@ -120,22 +119,22 @@ public class MainGUI extends JFrame {
                 }
                 switch (state) {
                     case 1:
-                        transData.getCustomers().add(line);
+                        TransData.staticObject.getCustomers().add(line);
                         break;
                     case 2:
-                        transData.getProviders().add(line);
+                        TransData.staticObject.getProviders().add(line);
                         break;
                     case 3:
-                        transData.getProvidersValues()[counter++] = Integer.parseInt(line);
+                        TransData.staticObject.getProvidersValues()[counter++] = Integer.parseInt(line);
                         break;
                     case 4:
-                        transData.getCustomersValues()[counter++] = Integer.parseInt(line);
+                        TransData.staticObject.getCustomersValues()[counter++] = Integer.parseInt(line);
                         break;
                     case 5:
                         StringTokenizer st = new StringTokenizer(line);
                         int i = 0;
                         while (st.hasMoreTokens()) {
-                            transData.getMatrix()[counter][i++] = Integer.parseInt(st.nextToken());
+                            TransData.staticObject.getMatrix()[counter][i++] = Integer.parseInt(st.nextToken());
                         }
                         counter++;
                         break;
@@ -143,7 +142,7 @@ public class MainGUI extends JFrame {
                         StringTokenizer st2 = new StringTokenizer(line);
                         int j = 0;
                         while (st2.hasMoreTokens()) {
-                            transData.getTmatrix()[counter][j++] = transData.new TriangularNumber(st2.nextToken());
+                            TransData.staticObject.getTmatrix()[counter][j++] = new FuzzyMatrix.TriangularNumber(st2.nextToken());
                         }
                         counter++;
                         break;
