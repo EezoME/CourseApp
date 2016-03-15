@@ -54,7 +54,13 @@ public class MainGUI extends JFrame {
         java.util.List<AlternativeSolution> asList = new ArrayList<>();
         asList.add(AlternativeSolution.northWestCorner(TransData.staticObject.getProvidersValues(), TransData.staticObject.getCustomersValues()));
         asList.get(0).calculateZ(TransData.staticObject.getMatrix());
-        asList.get(0).findNewAS();
+        asList.add(asList.get(0).findNewAS());
+        int counter = 1;
+        while (asList.get(counter) != null) {
+            asList.get(counter).calculateSigma(TransData.staticObject.getMatrix());
+            asList.add(asList.get(0).findNewAS());
+            counter++;
+        }
         for (int i = 0; i < asList.get(0).getASCount(); i++) {
             //TODO find an alternative solution
         }

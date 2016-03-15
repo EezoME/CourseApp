@@ -1,5 +1,6 @@
 package com.eezo;
 
+
 import java.util.List;
 
 /**
@@ -14,7 +15,7 @@ public class AlternativeSolution {
 
     public AlternativeSolution(int rowCount, int colCount) {
         matrix = new Matrix(rowCount, colCount);
-        lastASFound = 0;
+        lastASFound = -1;
     }
 
     public int getASCount() {
@@ -40,6 +41,10 @@ public class AlternativeSolution {
     }
 
     public AlternativeSolution findNewAS() {
+        lastASFound = matrix.getEmptyCellPosition(lastASFound);
+        if (lastASFound == -1){
+            return null;
+        }
         int counter = 0;
         for (int i = 0; i < matrix.getRowsNumber(); i++) {
             for (int j = 0; j < matrix.getColsNumber(); j++) {
@@ -54,10 +59,21 @@ public class AlternativeSolution {
         }
 
         List<Matrix.Cell> markedCells = matrix.findAS(matrix.getElementByOrderNumber(lastASFound));
+        AlternativeSolution newAS = new AlternativeSolution(matrix.getRowsNumber(), matrix.getColsNumber());
+        newAS.matrix = matrix;
+        boolean flag = true;
         for (int i = 0; i < markedCells.size(); i++) {
-            System.out.println(markedCells.get(i).getY()+", "+markedCells.get(i).getX());
+            Matrix.Cell foundedCell = newAS.matrix.matrixContainsCell(markedCells.get(i));
+            if (foundedCell != null){
+                foundedCell.setStatus(flag);
+                flag = !flag;
+            }
         }
-        return null;
+        /*for (int i = 0; i < markedCells.size(); i++) {
+            System.out.println(markedCells.get(i).getX()+", "+markedCells.get(i).getY());
+        }*/
+        System.out.println(newAS.matrix.toString());
+        return newAS;
     }
 
 
