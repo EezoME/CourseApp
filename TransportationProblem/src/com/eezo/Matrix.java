@@ -16,6 +16,19 @@ class Matrix {
         this.matrix = new Cell[rows*cols];
         this.rowsNumber = rows;
         this.colsNumber = cols;
+        int rowCounter = 0, colCounter = 0;
+        for (int i = 0; i < this.matrix.length; i++) {
+            matrix[i] = new Cell(rowCounter, colCounter, 0);
+            if (colCounter == colsNumber-1){
+                rowCounter++;
+                colCounter = 0;
+            } else {
+                colCounter++;
+            }
+        }
+        for (int i = 0; i < matrix.length; i++) {
+            System.out.println(matrix[i]);
+        }
     }
 
     public int getEmptyCellsNumber(){
@@ -29,16 +42,18 @@ class Matrix {
     }
 
     public Cell getElement(int row, int col){
+        System.out.println("row="+row+" col="+col);
         for (int i = 0; i < matrix.length; i++) {
-            if (matrix[i].getY() == row && matrix[i].getX() == col){
+            if (matrix[i].getX() == row && matrix[i].getY() == col){
                 return matrix[i];
             }
         }
+        System.out.println("ssssssss");
         return null;
     }
 
     public Cell getElementByOrderNumber(int number){
-        return number > 0 && matrix != null ? matrix[number] : null;
+        return number >= 0 && matrix != null ? matrix[number] : null;
     }
 
     public int getElementValue(int row, int col){
@@ -50,38 +65,93 @@ class Matrix {
         return getElement(row, col).getStatus() == null ? 0 : getElement(row, col).getStatus() ? 1 : -1;
     }
 
-    public List getDecisionTree(int startCellPos){
-        Cell startCell = getElementByOrderNumber(startCellPos);
-        if (startCell == null){
-            return null;
+    private Cell[] getSpecificRowElements(Cell cell){
+        Cell[] cells = new Cell[rowsNumber];
+        int ind = 0;
+        for (int i = 0; i < matrix.length; i++) {
+            if (matrix[i].getY() == cell.getY()){
+                cells[ind++] = matrix[i];
+            }
         }
-        List<List<Cell>> decisionTree = new ArrayList<>();
-        decisionTree.add(new ArrayList<Cell>());
-        decisionTree.get(0).add(startCell);
-
-        //
-
-        return decisionTree;
+        return cells;
     }
 
-    public void setMatrix(Cell[] matrix) {
-        this.matrix = matrix;
+    private Cell[] getSpecificColElements(Cell cell){
+        Cell[] cells = new Cell[colsNumber];
+        int ind = 0;
+        for (int i = 0; i < matrix.length; i++) {
+            if (matrix[i].getX() == cell.getX()){
+                cells[ind++] = matrix[i];
+            }
+        }
+        return cells;
+    }
+
+    /**
+     * Входной параметр - начальная позиция (НП)
+     Вызывается метод проверки текущей строки. Далее метод проверки текущего столбца и т.д.
+     Проверка текущей строки(ячейка вхождения)
+     Если она содержит НП, которая не является ЯВ, то возврат - НП
+     Иначе проверка заполненых ячеек
+     Если столбец ячейки содержит непустые значения, то возврат - заполненая ячейка строки
+     Проверка текущего столбца
+     Если она содержит НП, которая не является ЯВ, то возврат - НП
+     Иначе проверка заполненых ячеек
+     Если строка ячейки содержит непустые значения, то возврат - заполненная ячейка столбца
+     * @param targetCell target cell
+     */
+    public List<Cell> findAS(Cell targetCell){
+        List<Cell> cells = new ArrayList<>();
+        cells.add(targetCell);
+        boolean flag = true;
+        do {
+            if (flag) {
+                cells.add(checkRow(cells.get(cells.size() - 1), targetCell));
+            } else {
+                cells.add(checkCol(cells.get(cells.size() - 1), targetCell));
+            }
+            if (cells.get(cells.size() - 1) == null || cells.get(cells.size() - 1) == targetCell){
+                break;
+            }
+            flag = !flag;
+        } while (true);
+        return cells;
+    }
+
+    private Cell checkRow(Cell currentCell, Cell targetCell){
+        Cell[] cells = getSpecificRowElements(currentCell);
+        for (int i = 0; i < cells.length; i++) {
+            if (cells[i] == targetCell && cells[i] != currentCell){
+                return cells[i];
+            }
+            if (cells[i].getValue() == 0){
+                break;
+            }
+            return checkCol(cells[i], targetCell);
+        }
+        return null;
+    }
+
+    private Cell checkCol(Cell currentCell, Cell targetCell){
+        Cell[] cells = getSpecificColElements(currentCell);
+        for (int i = 0; i < cells.length; i++) {
+            if (cells[i] == targetCell && cells[i] != currentCell){
+                return cells[i];
+            }
+            if (cells[i].getValue() == 0){
+                break;
+            }
+            return checkRow(cells[i], targetCell);
+        }
+        return null;
     }
 
     public int getRowsNumber() {
         return rowsNumber;
     }
 
-    public void setRowsNumber(int rowsNumber) {
-        this.rowsNumber = rowsNumber;
-    }
-
     public int getColsNumber() {
         return colsNumber;
-    }
-
-    public void setColsNumber(int colsNumber) {
-        this.colsNumber = colsNumber;
     }
 
     class Cell {
@@ -101,22 +171,8 @@ class Matrix {
             return x;
         }
 
-        public void setX(int x) {
-            if (x < 0){
-                return;
-            }
-            this.x = x;
-        }
-
         public int getY() {
             return y;
-        }
-
-        public void setY(int y) {
-            if (y < 0){
-                return;
-            }
-            this.y = y;
         }
 
         public int getValue() {
@@ -131,8 +187,14 @@ class Matrix {
             return status;
         }
 
-        public void setStatus(Boolean status) {
-            this.status = status;
+        @Override
+        public String toString() {
+            return "Cell{" +
+                    "x=" + x +
+                    ", y=" + y +
+                    ", value=" + value +
+                    ", status=" + status +
+                    '}';
         }
     }
 }

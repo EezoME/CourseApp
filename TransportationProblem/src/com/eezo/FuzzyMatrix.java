@@ -1,5 +1,6 @@
 package com.eezo;
 
+import java.util.Arrays;
 import java.util.StringTokenizer;
 
 /**
@@ -36,5 +37,13 @@ public class FuzzyMatrix {
         public String toString() {
             return a1 + "," + a0 + "," + a2;
         }
+    }
+
+    @Override
+    public String toString() {
+        return "FuzzyMatrix{ matrix[" + Arrays.toString(matrix) +
+                "], rowsNumber=" + rowsNumber +
+                ", colsNumber=" + colsNumber +
+                '}';
     }
 }

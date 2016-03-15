@@ -1,5 +1,7 @@
 package com.eezo;
 
+import java.util.List;
+
 /**
  *
  * Created by Eezo on 19.02.2016.
@@ -51,9 +53,10 @@ public class AlternativeSolution {
             return null;
         }
 
-        Matrix.Cell targetCell = matrix.getElementByOrderNumber(lastASFound);
-
-
+        List<Matrix.Cell> markedCells = matrix.findAS(matrix.getElementByOrderNumber(lastASFound));
+        for (int i = 0; i < markedCells.size(); i++) {
+            System.out.println(markedCells.get(i).getY()+", "+markedCells.get(i).getX());
+        }
         return null;
     }
 
@@ -63,8 +66,9 @@ public class AlternativeSolution {
             return null;
         }
         AlternativeSolution as = new AlternativeSolution(N.length, S.length);
-        int[] s = S;
-        int[] n = N;
+        int[] s = S.clone();
+        int[] n = N.clone();
+        System.out.println(as.matrix.getRowsNumber()+" - rows, "+as.matrix.getColsNumber()+" - cols");
         for (int i = 0; i < as.matrix.getRowsNumber(); i++) {
             for (int j = 0; j < as.matrix.getColsNumber(); j++) {
                 if (n[i] < s[j]) {
@@ -79,12 +83,6 @@ public class AlternativeSolution {
                 }
             }
         }
-        /*for (int i = 0; i < as.matrix.length; i++) {
-            for (int j = 0; j < as.matrix[i].length; j++) {
-                System.out.print(as.matrix[i][j] + "\t");
-            }
-            System.out.println();
-        }*/
         return as;
     }
 

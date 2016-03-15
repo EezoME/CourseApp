@@ -2,29 +2,52 @@ package com.eezo;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.StringTokenizer;
 
 /**
- *
+ * This class consists data from file or GUI form
  * Created by Eezo on 07.02.2016.
  */
 public class TransData {
+    /**
+     * The only static object, use it for access to data
+     */
     public static TransData staticObject;
-
+    /**
+     * A list of customers names
+     */
     private List<String> customers;
+    /**
+     * An array of customers demands
+     */
     private int[] customersValues; // N
+    /**
+     * A list of providers names
+     */
     private List<String> providers;
+    /**
+     * An array of providers offers
+     */
     private int[] providersValues; // S
+    /**
+     * A matrix which contains transportation costs
+     */
     private int[][] matrix;
-    private FuzzyMatrix.TriangularNumber[][] tmatrix;
+    /**
+     * A matrix which contains fuzzy transportation costs
+     */
+    private FuzzyMatrix.TriangularNumber[][] fuzzyMatrix;
 
+    /**
+     * Default builder constructor
+     * @param builder builder
+     */
     private TransData(Builder builder){
         this.customersValues = builder.customersValues;
         this.providersValues = builder.providersValues;
         this.matrix = builder.matrix;
         this.customers = builder.customers;
         this.providers = builder.providers;
-        this.tmatrix = builder.tmatrix;
+        this.fuzzyMatrix = builder.fuzzyMatrix;
     }
 
     public static class Builder {
@@ -33,13 +56,14 @@ public class TransData {
         private List<String> providers;
         private int[] providersValues; // S
         private int[][] matrix;
-        private FuzzyMatrix.TriangularNumber[][] tmatrix;
+        private FuzzyMatrix.TriangularNumber[][] fuzzyMatrix;
 
         /**
          * Adds customers list values, providers list values and matrix.
          * @param customersValues customers list values
          * @param providersValues providers list values
          * @param matrix matrix
+         * Use {customers}, {providers}, {fuzzyMatrix} for add extra data.
          */
         public Builder(int[] customersValues, int[] providersValues, int[][] matrix){
             if (customersValues == null || providersValues == null || matrix == null){
@@ -60,15 +84,16 @@ public class TransData {
          * @param customers customers data
          * @param providers providers data
          * @param matrix matrix
+         * Use {fuzzyMatrix} for add extra data.
          */
         public Builder(List<String> customers, List<String> providers, int[][] matrix){
             if (customers == null || providers == null || matrix == null){
                 throw new NullPointerException();
             }
-            if (customers.size() == 0 || providers.size() == 0 ||
+            /*if (customers.size() == 0 || providers.size() == 0 ||
                     matrix.length == 0 || matrix[0].length == 0){
                 throw new IllegalArgumentException("Some of the arrays are zero length.");
-            }
+            }*/
             int[] s = new int[customers.size()];
             int[] n = new int[providers.size()];
             List<String> newCustomers = new ArrayList<>();
@@ -112,17 +137,21 @@ public class TransData {
             return this;
         }
 
-        public Builder fuzzyMatrix(FuzzyMatrix.TriangularNumber[][] tmatrix){
-            if (tmatrix == null){
+        public Builder fuzzyMatrix(FuzzyMatrix.TriangularNumber[][] fuzzyMatrix){
+            if (fuzzyMatrix == null){
                 throw new NullPointerException();
             }
-            if (tmatrix.length == 0 || tmatrix[0].length == 0){
+            if (fuzzyMatrix.length == 0 || fuzzyMatrix[0].length == 0){
                 throw new IllegalArgumentException("Fuzzy matrix array are zero length.");
             }
-            this.tmatrix = tmatrix;
+            this.fuzzyMatrix = fuzzyMatrix;
             return this;
         }
 
+        /**
+         * Renews {staticObject} of class {TransData}.
+         * @return {staticObject}
+         */
         public TransData build(){
             staticObject = new TransData(this);
             return staticObject;
@@ -131,13 +160,6 @@ public class TransData {
 
     public List<String> getCustomers() {
         return customers;
-    }
-
-    public void setCustomers(List<String> customers) {
-        if (customers == null){
-            return;
-        }
-        this.customers = customers;
     }
 
     public int[] getCustomersValues() {
@@ -153,13 +175,6 @@ public class TransData {
 
     public List<String> getProviders() {
         return providers;
-    }
-
-    public void setProviders(List<String> providers) {
-        if (providers == null){
-            return;
-        }
-        this.providers = providers;
     }
 
     public int[] getProvidersValues() {
@@ -178,21 +193,21 @@ public class TransData {
     }
 
     public void setMatrix(int[][] matrix) {
-        if (matrix == null || matrix.length == 0 || matrix[0].length == 0){
+        /*if (matrix == null || matrix.length == 0 || matrix[0].length == 0){
             return;
-        }
+        }*/
         this.matrix = matrix;
     }
 
-    public FuzzyMatrix.TriangularNumber[][] getTmatrix() {
-        return tmatrix;
+    public FuzzyMatrix.TriangularNumber[][] getFuzzyMatrix() {
+        return fuzzyMatrix;
     }
 
-    public void setTmatrix(FuzzyMatrix.TriangularNumber[][] tmatrix) {
-        if (tmatrix == null){
+    public void setFuzzyMatrix(FuzzyMatrix.TriangularNumber[][] fuzzyMatrix) {
+        if (fuzzyMatrix == null){
             return;
         }
-        this.tmatrix = tmatrix;
+        this.fuzzyMatrix = fuzzyMatrix;
     }
 
 }

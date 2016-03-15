@@ -59,7 +59,7 @@ public class InputDataDialog extends JDialog {
             customers = TransData.staticObject.getCustomers();
             providers = TransData.staticObject.getProviders();
             matrix = TransData.staticObject.getMatrix();
-            tmatrix = TransData.staticObject.getTmatrix();
+            tmatrix = TransData.staticObject.getFuzzyMatrix();
 
             for (int i = 0; i < customers.size(); i++) {
                 customers.set(i, customers.get(i)+"-"+TransData.staticObject.getProvidersValues()[i]);
@@ -261,9 +261,9 @@ public class InputDataDialog extends JDialog {
                 bw.write("\n");
             }
             bw.write(":tmtrx\n");
-            for (int i = 0; i < TransData.staticObject.getTmatrix().length; i++) {
-                for (int j = 0; j < TransData.staticObject.getTmatrix()[i].length; j++) {
-                    bw.write(TransData.staticObject.getTmatrix()[i][j]+" ");
+            for (int i = 0; i < TransData.staticObject.getFuzzyMatrix().length; i++) {
+                for (int j = 0; j < TransData.staticObject.getFuzzyMatrix()[i].length; j++) {
+                    bw.write(TransData.staticObject.getFuzzyMatrix()[i][j]+" ");
                 }
                 bw.write("\n");
             }

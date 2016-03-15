@@ -37,7 +37,7 @@ public class MainGUI extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 JFileChooser chooser = new JFileChooser();
                 chooser.setDialogTitle("Выберете исходный файл");
-                chooser.setCurrentDirectory(new File("..\\"));
+                chooser.setCurrentDirectory(new File("..\\CourseApp\\"));
                 chooser.showDialog(panel1, "Выбрать файл");
                 readFile(chooser.getSelectedFile());
             }
@@ -54,6 +54,7 @@ public class MainGUI extends JFrame {
         java.util.List<AlternativeSolution> asList = new ArrayList<>();
         asList.add(AlternativeSolution.northWestCorner(TransData.staticObject.getProvidersValues(), TransData.staticObject.getCustomersValues()));
         asList.get(0).calculateZ(TransData.staticObject.getMatrix());
+        asList.get(0).findNewAS();
         for (int i = 0; i < asList.get(0).getASCount(); i++) {
             //TODO find an alternative solution
         }
@@ -69,6 +70,7 @@ public class MainGUI extends JFrame {
         if (file == null) {
             return;
         }
+        new TransData.Builder(new ArrayList<String>(), new ArrayList<String>(), new int[5][3]).fuzzyMatrix(new FuzzyMatrix.TriangularNumber[5][3]).build();
         try {
             BufferedReader br = new BufferedReader(new FileReader(file));
             int state = 0;
@@ -87,11 +89,11 @@ public class MainGUI extends JFrame {
                 if (line.startsWith(":")) {
                     switch (line) {
                         case ":cust":
-                            TransData.staticObject.setCustomers(new ArrayList<String>());
+                            //TransData.staticObject.setCustomers(new ArrayList<String>());
                             state = 1;
                             break;
                         case ":prov":
-                            TransData.staticObject.setProviders(new ArrayList<String>());
+                            //TransData.staticObject.setProviders(new ArrayList<String>());
                             state = 2;
                             break;
                         case ":custval":
@@ -110,7 +112,7 @@ public class MainGUI extends JFrame {
                             counter = 0;
                             break;
                         case ":tmtrx":
-                            TransData.staticObject.setTmatrix(new FuzzyMatrix.TriangularNumber[TransData.staticObject.getProviders().size()][TransData.staticObject.getCustomers().size()]);
+                            TransData.staticObject.setFuzzyMatrix(new FuzzyMatrix.TriangularNumber[TransData.staticObject.getProviders().size()][TransData.staticObject.getCustomers().size()]);
                             state = 6;
                             counter = 0;
                             break;
@@ -142,7 +144,7 @@ public class MainGUI extends JFrame {
                         StringTokenizer st2 = new StringTokenizer(line);
                         int j = 0;
                         while (st2.hasMoreTokens()) {
-                            TransData.staticObject.getTmatrix()[counter][j++] = new FuzzyMatrix.TriangularNumber(st2.nextToken());
+                            TransData.staticObject.getFuzzyMatrix()[counter][j++] = new FuzzyMatrix.TriangularNumber(st2.nextToken());
                         }
                         counter++;
                         break;
