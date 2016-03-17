@@ -7,7 +7,7 @@ import java.util.List;
  * A class that represents a matrix of costs
  * Created by Eezo on 03.03.2016.
  */
-class Matrix {
+class Matrix implements Cloneable {
     private Cell[] matrix;
     private int rowsNumber;
     private int colsNumber;
@@ -133,7 +133,7 @@ class Matrix {
             } else {
                 cells.add(checkCol(cells.get(cells.size() - 1), targetCell));
             }
-            System.out.println("Adding cell: "+cells.get(cells.size() - 1));
+            Messaging.log("Adding cell: "+cells.get(cells.size() - 1));
             if (cells.get(cells.size() - 1) == null || cells.get(cells.size() - 1) == targetCell){
                 break;
             }
@@ -159,18 +159,36 @@ class Matrix {
      */
     private Cell checkRow(Cell currentCell, Cell targetCell){
         Cell[] cells = getSpecificRowElements(currentCell);
-        for (int i = 0; i < cells.length; i++) {
-            if (cells[i] == currentCell)
-                continue;
-            if (cells[i] == targetCell && targetCell != currentCell){
-                return cells[i];
+        /*if (currentCell.getY() == colsNumber-1 && currentCell.getX() == 1){
+            for (int i = cells.length-1; i >= 0; i--) {
+                if (cells[i] == currentCell)
+                    continue;
+                if (cells[i] == targetCell && targetCell != currentCell){
+                    return cells[i];
+                }
+                if (cells[i].getValue() == 0){
+                    continue;
+                }
+                // если колонка со значениями, вернёт ячейку, просчитать чтобы посморела что там нет таргет
+                if (checkLineHasMoreValues(cells[i], "col", targetCell)){
+                    return cells[i];
+                }
             }
-            if (cells[i].getValue() == 0){
-                continue;
-            }
-            if (checkLineHasMoreValues(cells[i], "col", targetCell)){
-                return cells[i];
-            }
+        } else {*/
+            for (int i = 0; i < cells.length; i++) {
+                if (cells[i] == currentCell)
+                    continue;
+                if (cells[i] == targetCell && targetCell != currentCell){
+                    return cells[i];
+                }
+                if (cells[i].getValue() == 0){
+                    continue;
+                }
+                // если колонка со значениями, вернёт ячейку, просчитать чтобы посморела что там нет таргет
+                if (checkLineHasMoreValues(cells[i], "col", targetCell)){
+                    return cells[i];
+                }
+           // }
         }
         return null;
     }
@@ -191,6 +209,7 @@ class Matrix {
         Если строка ячейки содержит непустые значения, то возврат - заполненная ячейка столбца
      */
     private Cell checkCol(Cell currentCell, Cell targetCell){
+        // FIXME: see log 1st and 2nd AS
         Cell[] cells = getSpecificColElements(currentCell);
         for (int i = 0; i < cells.length; i++) {
             if (cells[i] == currentCell)
@@ -198,6 +217,8 @@ class Matrix {
             if (cells[i] == targetCell && targetCell != currentCell){
                 return cells[i];
             }
+        }
+        for (int i = 0; i < cells.length; i++) {
             if (cells[i].getValue() == 0){
                 continue;
             }
@@ -234,6 +255,28 @@ class Matrix {
         return false;
     }
 
+    protected void recalculateMatrixValues(){
+        int minValue = Integer.MAX_VALUE;
+        for (int i = 0; i < matrix.length; i++) {
+            if (matrix[i].status == null){
+                continue;
+            }
+            if (!matrix[i].status && matrix[i].value < minValue){
+                minValue = matrix[i].value;
+            }
+        }
+        for (int i = 0; i < matrix.length; i++) {
+            if (matrix[i].status == null){
+                continue;
+            }
+            if (matrix[i].status){
+                matrix[i].value += minValue;
+            } else {
+                matrix[i].value -= minValue;
+            }
+        }
+    }
+
     public int getRowsNumber() {
         return rowsNumber;
     }
@@ -253,7 +296,20 @@ class Matrix {
         return result;
     }
 
-    class Cell {
+    @Override
+    protected Matrix clone() {
+        try {
+            Matrix newMatrix = new Matrix(rowsNumber, colsNumber);
+            for (int i = 0; i < matrix.length; i++) {
+                newMatrix.matrix[i] = this.matrix[i].clone();
+            }
+            return newMatrix;
+        } catch (CloneNotSupportedException e){
+            throw new AssertionError();
+        }
+    }
+
+    class Cell implements Cloneable {
         /**
          * Row index
          */
@@ -340,6 +396,11 @@ class Matrix {
         }
 
         @Override
+        protected Cell clone() throws CloneNotSupportedException {
+            return (Cell) super.clone();
+        }
+
+        @Override
         public String toString() {
             return "Cell{" +
                     "x = " + x +
@@ -349,4 +410,5 @@ class Matrix {
                     '}';
         }
     }
+
 }

@@ -31,6 +31,9 @@ public class FuzzyMatrix {
             this.a1 = Integer.parseInt(st.nextToken());
             this.a0 = Integer.parseInt(st.nextToken());
             this.a2 = Integer.parseInt(st.nextToken());
+            if (a1 > a0 || a0 > a2){
+                Messaging.showMessageDialog("Ошибка данных.\nПроверьте правильность ввода треугольных чисел: "+data);
+            }
         }
 
         @Override

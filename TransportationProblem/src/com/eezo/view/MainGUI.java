@@ -2,6 +2,7 @@ package com.eezo.view;
 
 import com.eezo.AlternativeSolution;
 import com.eezo.FuzzyMatrix;
+import com.eezo.Messaging;
 import com.eezo.TransData;
 
 import javax.swing.*;
@@ -50,20 +51,45 @@ public class MainGUI extends JFrame {
         });
     }
 
-    public void firstStage(){
+    private void firstStage(){
+        Messaging.log("FIRST STAGE STARTED");
         java.util.List<AlternativeSolution> asList = new ArrayList<>();
         asList.add(AlternativeSolution.northWestCorner(TransData.staticObject.getProvidersValues(), TransData.staticObject.getCustomersValues()));
         asList.get(0).calculateZ(TransData.staticObject.getMatrix());
-        asList.add(asList.get(0).findNewAS());
-        int counter = 1;
-        while (asList.get(counter) != null) {
-            asList.get(counter).calculateSigma(TransData.staticObject.getMatrix());
+        int loopCounter = 0;
+        do {
+            loopCounter++;
+            Messaging.log("Loop #"+loopCounter);
             asList.add(asList.get(0).findNewAS());
-            counter++;
-        }
-        for (int i = 0; i < asList.get(0).getASCount(); i++) {
-            //TODO find an alternative solution
-        }
+            int counter = 1;
+            while (asList.get(counter) != null) {
+                asList.get(counter).calculateSigma(TransData.staticObject.getMatrix());
+                asList.add(asList.get(0).findNewAS());
+                counter++;
+            }
+            asList.remove(asList.size() - 1);
+            counter = 0;
+            int min = Integer.MAX_VALUE;
+            for (int i = 0; i < asList.size(); i++) {
+                System.out.println(asList.get(i));
+                if (asList.get(i).getSigma() < min) {
+                    min = asList.get(i).getSigma();
+                    counter = i;
+                }
+            }
+            if (min >= 0) {
+                Messaging.showMessageDialog("Нет альтернатив лучших чем первоначальное решение.");
+                break;
+            } else {
+                Messaging.showMessageDialog("Найдена лучшая альтернатива: номер - " + counter + ", значение сигма = " + min);
+                asList.set(counter, asList.get(counter));
+                asList.get(0).recalculateValues();
+                while (asList.size() > 1){
+                    asList.remove(1);
+                }
+            }
+        } while (true);
+        Messaging.log("FIRST STAGE FINISHED");
     }
 
     /** CUSTOM **/
@@ -74,6 +100,7 @@ public class MainGUI extends JFrame {
 
     private void readFile(File file) {
         if (file == null) {
+            Messaging.showMessageDialog("File not found.");
             return;
         }
         new TransData.Builder(new ArrayList<String>(), new ArrayList<String>(), new int[5][3]).fuzzyMatrix(new FuzzyMatrix.TriangularNumber[5][3]).build();
