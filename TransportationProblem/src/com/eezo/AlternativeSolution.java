@@ -10,6 +10,7 @@ import java.util.List;
 public class AlternativeSolution {
     private Matrix matrix;
     private int Z;
+    private FuzzyMatrix.TriangularNumber fuzzyZ;
     private int sigma;
     private int lastASFound;
 
@@ -23,6 +24,10 @@ public class AlternativeSolution {
         return matrix.getEmptyCellsNumber();
     }
 
+    /**
+     * Calculates costs.
+     * @param tdMatrix table data matrix
+     */
     public void calculateZ(int[][] tdMatrix) {
         Z = 0;
         for (int i = 0; i < tdMatrix.length; i++) {
@@ -30,6 +35,16 @@ public class AlternativeSolution {
                 Z += matrix.getElementValue(i, j) * tdMatrix[i][j]; // might be simplify to getElement().getValue()
             }
         }
+    }
+
+    public void calculateFuzzyZ(FuzzyMatrix.TriangularNumber[][] ftdMatrix){
+        fuzzyZ = new FuzzyMatrix.TriangularNumber();
+        for (int i = 0; i < ftdMatrix.length; i++) {
+            for (int j = 0; j < ftdMatrix[i].length; j++) {
+                fuzzyZ.addTNtoZ(ftdMatrix[i][j], matrix.getElementValue(i, j));
+            }
+        }
+        Messaging.log("Fuzzy Z = "+fuzzyZ);
     }
 
     public void calculateSigma(int[][] tdMatrix) {
@@ -121,8 +136,34 @@ public class AlternativeSolution {
         return as;
     }
 
+    public Matrix getMatrix(){
+        return this.matrix;
+    }
+
+    public FuzzyMatrix.TriangularNumber getFuzzyZ() {
+        return fuzzyZ;
+    }
+
+    /**
+     * Recalculates cells values according to their statuses
+     */
     public void recalculateValues(){
         matrix.recalculateMatrixValues();
+    }
+
+    /**
+     * Converts fuzzy number (unary minus)
+     */
+    public void convertFuzzyNumbers(){
+        fuzzyZ.convert();
+    }
+
+    public int getFuzzyMin(){
+        return fuzzyZ.getMin();
+    }
+
+    public float getFuzzyEps(){
+        return fuzzyZ.getEps();
     }
 
     public int getZ() {
@@ -131,6 +172,10 @@ public class AlternativeSolution {
 
     public int getSigma() {
         return sigma;
+    }
+
+    public void resetSigma(){
+        sigma = 0;
     }
 
     @Override

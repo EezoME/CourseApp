@@ -25,6 +25,10 @@ public final class Messaging {
         JOptionPane.showMessageDialog(null, message,"Program message", t);
     }
 
+    public static String showInputDialog(String message){
+        return JOptionPane.showInputDialog(null, message);
+    }
+
     public static void log(String message){
         log(message, "info");
     }
@@ -38,4 +42,6 @@ public final class Messaging {
             System.out.println("INFO: "+message);
         }
     }
+
+
 }

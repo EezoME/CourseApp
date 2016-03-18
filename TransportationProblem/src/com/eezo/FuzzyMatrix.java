@@ -23,6 +23,18 @@ public class FuzzyMatrix {
         private int a0;
         private int a2;
 
+        public TriangularNumber(){
+            this.a1 = 0;
+            this.a0 = 0;
+            this.a2 = 0;
+        }
+
+        public TriangularNumber(int a1, int a0, int a2) {
+            this.a1 = a1;
+            this.a0 = a0;
+            this.a2 = a2;
+        }
+
         public TriangularNumber(String data){
             if (data == null || data.isEmpty()){
                 return;
@@ -36,9 +48,69 @@ public class FuzzyMatrix {
             }
         }
 
+        public void addTNtoZ(TriangularNumber tn, int cellValue){
+            if (tn == null || tn.a1 > tn.a0 || tn.a0 > tn.a2){
+                Messaging.log("Input triangular number is incorrect.","err");
+                return;
+            }
+            this.a1 += tn.a1*cellValue;
+            this.a0 += tn.a0*cellValue;
+            this.a2 += tn.a2*cellValue;
+        }
+
+        public TriangularNumber substractTNs(TriangularNumber tn){
+            if (tn == null || tn.a1 > tn.a0 || tn.a0 > tn.a2){
+                Messaging.log("Input triangular number is incorrect.","err");
+                return null;
+            }
+            TriangularNumber number = new TriangularNumber();
+            number.a1 = this.a1 - tn.a1;
+            number.a0 = this.a0 - tn.a0;
+            number.a2 = this.a2 - tn.a2;
+            return number;
+        }
+
+        public void convert(){
+            this.a1 = -a1;
+            this.a0 = -a0;
+            this.a2 = -a2;
+        }
+
+        public int getMin(){
+            if (a1 < a0 && a1 < a2){
+                return a1;
+            } else if (a0 < a1 && a0 < a2){
+                return a0;
+            } else {
+                return a2;
+            }
+        }
+
+        public int getMax(){
+            if (a1 > a0 && a1 > a2){
+                return a1;
+            } else if (a0 > a1 && a0 > a2){
+                return a0;
+            } else {
+                return a2;
+            }
+        }
+
+        public TriangularNumber getMax(TriangularNumber tn){
+            TriangularNumber number = new TriangularNumber();
+            number.a1 = this.a1 > tn.a1 ? this.a1 : tn.a1;
+            number.a0 = this.a0 > tn.a0 ? this.a0 : tn.a0;
+            number.a2 = this.a2 > tn.a2 ? this.a2 : tn.a2;
+            return number;
+        }
+
+        public float getEps(){
+            return Math.abs((a1+2*a0+a2)/2);
+        }
+
         @Override
         public String toString() {
-            return a1 + "," + a0 + "," + a2;
+            return "[" + a1 + "," + a0 + "," + a2 + "]";
         }
     }
 

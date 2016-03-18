@@ -7,7 +7,7 @@ import java.util.List;
  * A class that represents a matrix of costs
  * Created by Eezo on 03.03.2016.
  */
-class Matrix implements Cloneable {
+public class Matrix implements Cloneable {
     private Cell[] matrix;
     private int rowsNumber;
     private int colsNumber;
@@ -159,7 +159,7 @@ class Matrix implements Cloneable {
      */
     private Cell checkRow(Cell currentCell, Cell targetCell){
         Cell[] cells = getSpecificRowElements(currentCell);
-        /*if (currentCell.getY() == colsNumber-1 && currentCell.getX() == 1){
+        if (currentCell.getY() > colsNumber/2){
             for (int i = cells.length-1; i >= 0; i--) {
                 if (cells[i] == currentCell)
                     continue;
@@ -174,7 +174,7 @@ class Matrix implements Cloneable {
                     return cells[i];
                 }
             }
-        } else {*/
+        } else {
             for (int i = 0; i < cells.length; i++) {
                 if (cells[i] == currentCell)
                     continue;
@@ -188,7 +188,7 @@ class Matrix implements Cloneable {
                 if (checkLineHasMoreValues(cells[i], "col", targetCell)){
                     return cells[i];
                 }
-           // }
+            }
         }
         return null;
     }
@@ -210,20 +210,35 @@ class Matrix implements Cloneable {
      */
     private Cell checkCol(Cell currentCell, Cell targetCell){
         // FIXME: see log 1st and 2nd AS
-        Cell[] cells = getSpecificColElements(currentCell);
-        for (int i = 0; i < cells.length; i++) {
-            if (cells[i] == currentCell)
-                continue;
-            if (cells[i] == targetCell && targetCell != currentCell){
-                return cells[i];
+        if (currentCell.x > rowsNumber/2){
+            Cell[] cells = getSpecificColElements(currentCell);
+            for (int i = cells.length-1; i >= 0; i--) {
+                if (cells[i] == currentCell)
+                    continue;
+                if (cells[i].getValue() == 0) {
+                    continue;
+                }
+                if (checkLineForTarget(cells, targetCell) && targetCell != currentCell) {
+                    return targetCell;
+                }
+                if (checkLineHasMoreValues(cells[i], "row", targetCell)) {
+                    return cells[i];
+                }
             }
-        }
-        for (int i = 0; i < cells.length; i++) {
-            if (cells[i].getValue() == 0){
-                continue;
-            }
-            if (checkLineHasMoreValues(cells[i], "row", targetCell)){
-                return cells[i];
+        } else {
+            Cell[] cells = getSpecificColElements(currentCell);
+            for (int i = 0; i < cells.length; i++) {
+                if (cells[i] == currentCell)
+                    continue;
+                if (cells[i].getValue() == 0) {
+                    continue;
+                }
+                if (checkLineForTarget(cells, targetCell) && targetCell != currentCell) {
+                    return targetCell;
+                }
+                if (checkLineHasMoreValues(cells[i], "row", targetCell)) {
+                    return cells[i];
+                }
             }
         }
         return null;
@@ -255,6 +270,18 @@ class Matrix implements Cloneable {
         return false;
     }
 
+    private boolean checkLineForTarget(Cell[] cells, Cell target){
+        for (int i = 0; i < cells.length; i++) {
+            if (cells[i] == target){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Recalculates cells values according to their statuses
+     */
     protected void recalculateMatrixValues(){
         int minValue = Integer.MAX_VALUE;
         for (int i = 0; i < matrix.length; i++) {
@@ -275,6 +302,24 @@ class Matrix implements Cloneable {
                 matrix[i].value -= minValue;
             }
         }
+        for (int i = 0; i < matrix.length; i++) {
+            matrix[i].status = null;
+        }
+    }
+
+    public Cell[] getRow(int ind){
+        if (ind < 0 || ind >= colsNumber){
+            Messaging.log("getRow: invalid row index","warn");
+            return null;
+        }
+        Cell[] row = new Cell[colsNumber];
+        int counter = 0;
+        for (int i = 0; i < matrix.length; i++) {
+            if (matrix[i].y == ind){
+                row[counter++] = matrix[i];
+            }
+        }
+        return row;
     }
 
     public int getRowsNumber() {
